@@ -1,0 +1,431 @@
+project.apply plugin: 'kotlin-android'
+project.apply plugin: 'kotlin-android-extensions'
+
+project.dependencies.add('implementation', "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version")
+project.dependencies.add('implementation', "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+project.dependencies.add('api', "org.jetbrains.kotlin:kotlin-reflect:1.4.32")// 添加Kotln反射库，实现JSON自动解析
+
+/**
+ * 判断是否有jenkins
+ * @return
+ */
+boolean isInJenkins() {
+    Map<String, String> map = System.getenv()
+    if (map == null) {
+        return false
+    }
+    String str = map.get("Path")
+    if (str != null) {        //it's windows
+        return false;
+    } else {
+        str = ""
+        Iterator it = map.iterator();
+        while (it.hasNext()) {
+            str += it.next();
+        }
+        if (str.contains("jenkins")) {
+            return true
+        } else {
+            return false
+        }
+    }
+}
+
+boolean isMockInJekins() {
+    return false
+}
+
+def localBuildCode() {
+    return 100
+}
+
+
+def vTargetSdkVersion() {
+    // 为了适配7.0以上手机屏幕有一条黑条的问题，此处的target版本必须大于等于24
+    // 8.0以上的系统新增了NotificationChannel的方法，如果指定的target版本大于等于27则需要修改complie版本到8.0以上，所以target版本暂时不要大于等于27
+    //    return 25
+    return 25
+}
+
+/**
+ * 获取Jenkins Build 号
+ * @return
+ */
+def getJenkinsBuildCode() {
+    if (isInJenkins()) {
+        ext.env = System.getenv()
+        ext.buildNumber = env.BUILD_NUMBER?.toInteger()
+        return "$buildNumber"
+    }
+    return String.valueOf(localBuildCode())
+}
+
+def getJenkinsBuildCodeInteger() {
+    if (isInJenkins()) {
+        ext.env = System.getenv()
+        return env.BUILD_NUMBER?.toInteger()
+    }
+    return localBuildCode()
+}
+
+/**
+ * 创建文件夹
+ */
+def mkdirBuild(String channel) {
+    def values = channel.split('_');
+    def vcode = Integer.valueOf(vTime())
+    def bcode = getJenkinsBuildCode()
+    def path
+    if (!isInJenkins()) {
+        path = "./../build_out/NetDisc/${vcode}/${bcode}/${channel}"
+    } else {
+        path = "/var/jenkins_home/build_out/NetDisc/${vcode}/${bcode}/${values[0]}/${values[1]}/"
+    }
+
+    File file = new File(path)
+    if (!file.exists()) {
+        file.mkdirs()
+    }
+
+    return file.getAbsolutePath()
+}
+
+/**
+ * 设置时间
+ * @return
+ */
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("GMT+8"))
+}
+
+/**
+ * 获取时间
+ * @return
+ */
+def vTime() {
+    return Integer.valueOf(new Date().format("yyMMddHH", TimeZone.getTimeZone("GMT+8")))
+}
+
+/**
+ * 设置versioncode
+ *  规则如下 ：
+ *  2.1.0->621000000
+ *  2.1.1->621100000
+ *  2.3.0->623000000
+ *  3.0.0->630000000
+ *  ....
+ *  ....
+ *  (如: 2.3.0->623000000)
+ *
+ *
+ * @return
+ */
+def vCode() {
+    def code = 100000000
+    return code + getJenkinsBuildCodeInteger()
+}
+
+def vName() {
+    def buildNO = getJenkinsBuildCode()
+    return "1.0.0." + buildNO
+}
+
+/**
+ * lib 编译定义
+ * @return
+ */
+def commonLibConfig() {
+    return android {
+        compileSdkVersion 29
+
+        defaultConfig {
+            minSdkVersion 21
+            targetSdkVersion Integer.valueOf(vTargetSdkVersion())
+            versionCode 1
+            versionName "1.0"
+
+            javaCompileOptions {
+                annotationProcessorOptions {
+                    arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+                }
+            }
+
+//            ndk {
+//                // 设置支持的SO库架构
+//                abiFilters 'arm64-v8a', 'armeabi-v7a'
+//                //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+//            }
+        }
+        buildTypes {
+            release {
+                minifyEnabled false
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            }
+        }
+
+        useLibrary 'org.apache.http.legacy'
+        flavorDimensions "channel"
+
+        compileOptions {
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
+        }
+
+        packagingOptions {
+            exclude 'META-INF/DEPENDENCIES.txt'
+            exclude 'META-INF/LICENSE.txt'
+            exclude 'META-INF/NOTICE.txt'
+            exclude 'META-INF/NOTICE'
+            exclude 'META-INF/LICENSE'
+            exclude 'META-INF/DEPENDENCIES'
+            exclude 'META-INF/notice.txt'
+            exclude 'META-INF/license.txt'
+            exclude 'META-INF/dependencies.txt'
+            exclude 'META-INF/LGPL2.1'
+        }
+        dexOptions {
+            javaMaxHeapSize "4g"
+        }
+        lintOptions {
+            xmlReport false
+            htmlReport false
+            ignoreWarnings false
+            abortOnError false
+            checkAllWarnings false
+        }
+    }
+}
+
+/**
+ * app 编译定义
+ * @param packageName
+ * @param workspace
+ * @param proguard
+ * @return
+ */
+def commonBuildConfig(String packageName, String workspace, boolean proguard) {
+    return android {
+        signingConfigs {
+            release {
+                keyAlias 'fuwei'
+                storeFile file('../config/keystore/fuwei.keystore')
+                keyPassword 'freshman870218'
+                storePassword 'freshman870218'
+            }
+            debug {
+                storeFile file('../config/keystore/debug.keystore')
+            }
+        }
+        compileSdkVersion 29
+        defaultConfig {
+            applicationId packageName
+            minSdkVersion 21
+            targetSdkVersion Integer.valueOf(vTargetSdkVersion())
+            versionCode Integer.valueOf(vCode())
+            versionName "${vName()}"
+
+//            ndk {
+//                // 设置支持的SO库架构
+//                abiFilters 'arm64-v8a', 'armeabi-v7a'
+//                //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+//            }
+        }
+
+        buildFeatures {
+            viewBinding = true
+        }
+
+        compileOptions {
+            sourceCompatibility 1.8
+            targetCompatibility 1.8
+        }
+
+        buildTypes {
+            release {
+                signingConfig signingConfigs.release
+                if (proguard) {
+                    minifyEnabled true
+                    proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+                }
+                debuggable false
+
+                applicationVariants.all { variant ->
+                    variant.outputs.all { output ->
+
+                        if (outputFileName != null && outputFileName.endsWith('release.apk')) {
+                            def values = outputFileName.split('-')
+                            def pathName = mkdirBuild(values[1])
+
+                            def fileName = "/${workspace}_${defaultConfig.versionCode}_${defaultConfig.versionName}_${releaseTime()}_${values[1]}.apk"
+                            println("mkdirBuild outputFileName =>" + outputFileName + ",fileName =>" + fileName)
+
+                            srcApks.add(outputFile)
+                            dstPaths.add(pathName)
+                            dstApks.add(fileName)
+
+                            if (isInJenkins()) {
+                                def path = "/var/jenkins_home/workspace/netdisc-android/build_out/${getJenkinsBuildCode()}/${values[1]}"
+                                File file = new File(path)
+                                if (!file.exists()) {
+                                    file.mkdirs()
+                                }
+                                dstPaths2.add(file.getAbsolutePath())
+                            }
+
+                        }
+                    }
+                }
+
+                afterEvaluate {
+                    assembleRelease.doLast {
+                        forEachApkFile(srcApks, dstApks)
+                    }
+                }
+            }
+            debug {
+                signingConfig signingConfigs.release
+                if (proguard) {
+                    minifyEnabled true
+                    proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+                }
+            }
+        }
+
+        packagingOptions {
+            exclude 'META-INF/DEPENDENCIES.txt'
+            exclude 'META-INF/LICENSE.txt'
+            exclude 'META-INF/NOTICE.txt'
+            exclude 'META-INF/NOTICE'
+            exclude 'META-INF/LICENSE'
+            exclude 'META-INF/DEPENDENCIES'
+            exclude 'META-INF/notice.txt'
+            exclude 'META-INF/license.txt'
+            exclude 'META-INF/dependencies.txt'
+            exclude 'META-INF/LGPL2.1'
+        }
+
+        useLibrary 'org.apache.http.legacy'
+        flavorDimensions "channel"
+
+        dexOptions {
+            javaMaxHeapSize "4g"
+        }
+        lintOptions {
+            checkReleaseBuilds false
+            xmlReport false
+            htmlReport false
+            ignoreWarnings false
+            abortOnError false
+            checkAllWarnings false
+        }
+    }
+}
+
+/**
+ * 是否编译公网版本
+ *
+ * @return
+ */
+boolean isCompilePublicChannel() {
+    boolean ret = false
+    return isInJenkins() || ret
+}
+
+/**
+ * 编译渠道设置
+ * jenkins下编译全渠道
+ * debug下编译调试渠道
+ * @return
+ */
+def commonFlavors() {
+    if (isInJenkins()) {
+        return android {
+            productFlavors {
+                netDisc_public {
+                    dimension "channel"
+                }
+                netDisc_test {
+                    dimension "channel"
+                }
+            }
+        }
+    } else {
+        return android {
+            productFlavors {
+
+                if (isMockInJekins()) {
+                    netDisc_public {
+                        dimension "channel"
+                    }
+                    netDisc_test {
+                        dimension "channel"
+                    }
+                } else {
+                    if (isCompilePublicChannel()) {
+                        netDisc_public {
+                            dimension "channel"
+                        }
+                    } else {
+                        netDisc_test {
+                            dimension "channel"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+def forEachApkFile(srcApks, dstApks) {
+    for (int i = 0; i < srcApks.size(); i++) {
+        def src = srcApks[i]
+        def dst = dstApks[i]
+        def path = dstPaths[i]
+        rename_and_moveout_apk(src, path, dst)
+
+        if (isInJenkins()) {
+            def path2 = dstPaths2[i]
+            rename_and_moveout_apk(src, path2, dst)
+        }
+
+
+    }
+}
+
+def rename_and_moveout_apk(src, path, dst) {
+    println("<===")
+    println(src)
+    println("===>")
+    println(dst)
+    copy() {
+        CopySpec copySpec ->
+            from src
+            into path
+            rename {
+                String srcFileName ->
+                    path + dst
+            }
+    }
+}
+
+ext {
+    vCode = this.&vCode
+    vName = this.&vName
+    localBuildCode = this.&localBuildCode
+    mkdirBuild = this.&mkdirBuild
+    isInJenkins = this.&isInJenkins
+    getJenkinsBuildCode = this.&getJenkinsBuildCode
+    getJenkinsBuildCodeInteger = this.&getJenkinsBuildCodeInteger
+    releaseTime = this.&releaseTime
+    commonLibConfig = this.&commonLibConfig
+    commonBuildConfig = this.&commonBuildConfig
+    commonFlavors = this.&commonFlavors
+    isCompilePublicChannel = this.&isCompilePublicChannel
+    isMockInJekins = this.&isMockInJekins
+
+    srcApks = []
+    dstApks = []
+    dstPaths = []
+    dstPaths2 = []
+
+}

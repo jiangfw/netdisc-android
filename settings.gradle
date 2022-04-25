@@ -1,0 +1,6 @@
+include ':libui'
+include ':libnetwork'
+include ':libcommon'
+include ':libconfig'
+include ':app'
+//rootProject.name = "netdisc-android"

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="TextSizeTitle">24sp</dimen>
+    <dimen name="TextSizeContent">16sp</dimen>
+    <dimen name="TextSizeNetWork">20sp</dimen>
+
+
+    <dimen name="TextSize_32">24sp</dimen>
+    <dimen name="TextSize_28">20sp</dimen>
+    <dimen name="TextSize_26">18sp</dimen>
+    <dimen name="TextSize_22">14sp</dimen>
+    <dimen name="TextSize_18">12sp</dimen>
+
+
+</resources>

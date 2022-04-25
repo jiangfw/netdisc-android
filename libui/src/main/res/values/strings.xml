@@ -1,0 +1,5 @@
+<resources>
+    <string name="user_login_title">登录</string>
+    <string name="user_logout_title">退出登录</string>
+
+</resources>

@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">私人网盘</string>
+
+    <string name="file_icon">File icon</string>
+    <string name="interpunct">•</string>
+    <string name="file_options_content_description">File options</string>
+
+
+</resources>
