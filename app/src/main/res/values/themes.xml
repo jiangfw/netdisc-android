@@ -15,5 +15,15 @@
 
         <item name="textColorPrimary">#212121</item>
         <item name="textColorSecondary">#757575</item>
+
+
+
+        <item name="backgroundColor">#FAFAFA</item>
+        <item name="cardColor">#FFFFFF</item>
+        <item name="dividerColor">#BDBDBD</item>
+        <item name="iconTint">#4A4A4A</item>
+        <item name="colorControlNormal">#757575</item>
+        <item name="colorControlActivated">?attr/colorAccent</item>
+        <item name="colorControlHighlight">#757575</item>
     </style>
 </resources>

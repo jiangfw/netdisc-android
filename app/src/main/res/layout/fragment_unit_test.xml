@@ -16,4 +16,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <include
+        android:id="@+id/include_file_explorer"
+        layout="@layout/fragment_file_explorer_list"
+        android:visibility="gone" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

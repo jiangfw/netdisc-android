@@ -4,6 +4,9 @@
     <string name="file_icon">File icon</string>
     <string name="interpunct">•</string>
     <string name="file_options_content_description">File options</string>
+    <string name="content_description_circle">circle</string>
+    <string name="empty_folder">The folder is empty</string>
+    <string name="no_search_results">No search results</string>
 
 
 </resources>

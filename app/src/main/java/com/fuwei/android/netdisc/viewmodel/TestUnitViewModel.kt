@@ -70,6 +70,7 @@ class TestUnitViewModel : BaseViewModel() {
     private fun fetchFileList() {
         //http://106.12.132.116:8088/test/get/file/list?dir=myfile
         val requestUrl = "http://106.12.132.116:8088/test/get/file/list"
+//        val requestUrl = "http://192.168.1.116:8088/test/get/file/list"
         val httpParams = HttpParams()
         httpParams.put("dir", "myfile")
         OkGo.get<String>(requestUrl)
@@ -89,7 +90,7 @@ class TestUnitViewModel : BaseViewModel() {
                         TAG,
                         "onError body = ${response?.body()} ,code = ${response?.code()} , message = ${response?.message()}"
                     )
-                    action.postValue(response?.toString())
+                    action.postValue("onError body = ${response?.body()} ,code = ${response?.code()} , message = ${response?.message()}")
 
 
                 }
