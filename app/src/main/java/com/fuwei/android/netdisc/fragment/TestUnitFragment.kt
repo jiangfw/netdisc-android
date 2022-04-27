@@ -24,11 +24,11 @@ import org.json.JSONException
  * Created by fuwei on 4/24/22.
  */
 class TestUnitFragment : BaseFragment<TestUnitViewModel>(),
-    FileExplorerRecyclerViewAdapter.OnClickListener {
+    FileExplorerRecyclerViewAdapter.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private var recyclerViewAdapter: FileExplorerRecyclerViewAdapter? = null
     private var recyclerViewLinearLayoutManager: LinearLayoutManager? = null
-    private val swipeRefreshLayout: SwipeRefreshLayout? = null
+    private var swipeRefreshLayout: SwipeRefreshLayout? = null
 
     companion object {
         fun newInstance(data: Bundle?): TestUnitFragment {
@@ -44,6 +44,9 @@ class TestUnitFragment : BaseFragment<TestUnitViewModel>(),
 
     override fun initView(view: View, bundle: Bundle?) {
 
+        swipeRefreshLayout = view.findViewById(R.id.file_explorer_srl)
+        swipeRefreshLayout?.setOnRefreshListener(this)
+        swipeRefreshLayout?.isRefreshing = true
 
         val recyclerView: RecyclerView = view.findViewById(R.id.file_explorer_list)
         recyclerViewLinearLayoutManager = LinearLayoutManager(context)
@@ -105,6 +108,7 @@ class TestUnitFragment : BaseFragment<TestUnitViewModel>(),
             }
         }
 
+        swipeRefreshLayout?.isRefreshing = false
         recyclerViewAdapter?.newData(fileItemList)
 
     }
@@ -128,4 +132,10 @@ class TestUnitFragment : BaseFragment<TestUnitViewModel>(),
         return arrayOf("http://106.12.132.116", "8088")
 
     }
+
+    override fun onRefresh() {
+        mViewModel?.fetchFileList()
+    }
+
+
 }

@@ -3,6 +3,7 @@ package com.fuwei.android.netdisc.activity
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.FragmentTransaction
@@ -115,6 +116,10 @@ class HomeActivity : BaseActivity(), View.OnClickListener {
 
             }
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        return super.onKeyDown(keyCode, event)
     }
 
 }

@@ -67,7 +67,7 @@ class TestUnitViewModel : BaseViewModel() {
     }
 
 
-    private fun fetchFileList() {
+    fun fetchFileList() {
         //http://106.12.132.116:8088/test/get/file/list?dir=myfile
         val requestUrl = "http://106.12.132.116:8088/test/get/file/list"
 //        val requestUrl = "http://192.168.1.116:8088/test/get/file/list"
