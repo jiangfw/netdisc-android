@@ -1,34 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:background="?attr/backgroundColor" >
+    android:id="@+id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/backgroundColor"
+    android:orientation="vertical">
 
-    <include
-        layout="@layout/empty_directory_state" />
+    <include layout="@layout/empty_directory_state" />
 
-    <include
-        layout="@layout/no_search_results" />
+    <include layout="@layout/no_search_results" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/file_explorer_srl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottom_bar" >
+        android:layout_above="@+id/bottom_bar">
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/file_explorer_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/file_explorer_list"
             android:clipToPadding="false"
+            android:focusable="true"
             android:paddingBottom="54dp"
             app:layoutManager="LinearLayoutManager"
-            tools:listitem="@layout/fragment_file_explorer_item"
-            android:focusable="true"/>
+            tools:listitem="@layout/fragment_file_explorer_item" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.leinardi.android.speeddial.SpeedDialOverlayLayout
@@ -36,7 +34,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/fabOverlayColor"
-        app:clickable_overlay="true"/>
+        android:visibility="gone"
+        app:clickable_overlay="true" />
 
     <com.leinardi.android.speeddial.SpeedDialView
         android:id="@+id/fab_fragment_file_explorer_list"
@@ -44,10 +43,13 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="2dp"
+        android:visibility="visible"
         app:layout_behavior="@string/speeddial_scrolling_view_snackbar_behavior"
         app:sdExpansionMode="top"
-        app:sdMainFabOpenedSrc="@drawable/ic_close"
-        app:sdMainFabClosedSrc="@drawable/ic_add" />
+        app:sdMainFabClosedSrc="@drawable/ic_add"
+        app:sdMainFabOpenedSrc="@drawable/ic_close" />
+
+    <include layout="@layout/bottom_bar" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

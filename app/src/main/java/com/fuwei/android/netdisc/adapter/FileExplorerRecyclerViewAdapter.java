@@ -50,10 +50,15 @@ public class FileExplorerRecyclerViewAdapter extends RecyclerView.Adapter<FileEx
 
     public interface OnClickListener {
         void onFileClicked(FileItem fileItem);
+
         void onDirectoryClicked(FileItem fileItem, int position);
+
         void onFilesSelected();
+
         void onFileDeselected();
+
         void onFileOptionsClicked(View view, FileItem fileItem);
+
         String[] getThumbnailServerParams();
     }
 
@@ -78,10 +83,6 @@ public class FileExplorerRecyclerViewAdapter extends RecyclerView.Adapter<FileEx
         theme.resolveAttribute(R.attr.colorPrimaryLight, typedValue, true);
         selectionColor = typedValue.data;
         optionsDisabled = false;
-//        sizeLimit = PreferenceManager.getDefaultSharedPreferences(context)
-//                .getLong(context.getString(R.string.pref_key_thumbnail_size_limit),
-//                        context.getResources().getInteger(R.integer.default_thumbnail_size_limit));
-
         sizeLimit = 20971520;
     }
 
@@ -111,7 +112,6 @@ public class FileExplorerRecyclerViewAdapter extends RecyclerView.Adapter<FileEx
         }
 
         if (showThumbnails && !item.isDir()) {
-            String server = "http://127.0.0.1:29179/";
             boolean localLoad = item.getRemote().getType() == RemoteItem.SAFW;
             String mimeType = item.getMimeType();
             if ((mimeType.startsWith("image/") || mimeType.startsWith("video/")) && item.getSize() <= sizeLimit) {
@@ -119,7 +119,7 @@ public class FileExplorerRecyclerViewAdapter extends RecyclerView.Adapter<FileEx
                         .centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.drawable.ic_file);
-                if(localLoad) {
+                if (localLoad) {
                     bindSafFile(holder, item, glideOption);
                 } else {
                     String[] serverParams = listener.getThumbnailServerParams();
@@ -146,7 +146,7 @@ public class FileExplorerRecyclerViewAdapter extends RecyclerView.Adapter<FileEx
             holder.fileModTime.setVisibility(View.VISIBLE);
             holder.fileModTime.setText(item.getHumanReadableModTime());
         }
-        
+
         holder.fileName.setText(item.getName());
 
         if (isInSelectMode) {
@@ -194,12 +194,12 @@ public class FileExplorerRecyclerViewAdapter extends RecyclerView.Adapter<FileEx
             }
         });
 
-//        holder.view.setOnLongClickListener(view -> {
-//            if (!isInMoveMode && canSelect) {
-//                onLongClickAction(item, holder);
-//            }
-//            return true;
-//        });
+        holder.view.setOnLongClickListener(view -> {
+            if (!isInMoveMode && canSelect) {
+                onLongClickAction(item, holder);
+            }
+            return true;
+        });
 
         holder.icons.setOnClickListener(v -> {
             if (!isInMoveMode && canSelect) {

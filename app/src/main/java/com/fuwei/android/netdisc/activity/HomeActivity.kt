@@ -45,6 +45,7 @@ class HomeActivity : BaseActivity(), View.OnClickListener {
 
             HomeEnum.FILE_LIST -> {
                 data.putString("action", "file_list")
+                data.putString("data", et_file_input.text.toString())
                 transaction.replace(
                     R.id.frame_layout,
                     TestUnitFragment.newInstance(data),

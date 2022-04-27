@@ -1,15 +1,13 @@
 package com.fuwei.android.netdisc.viewmodel
 
 import android.os.Bundle
+import android.text.TextUtils
 import com.fuwei.android.libcommon.logger.AILog
 import com.fuwei.android.libui.base.BaseViewModel
 import com.lzy.okgo.OkGo
 import com.lzy.okgo.callback.StringCallback
 import com.lzy.okgo.model.HttpParams
 import com.lzy.okgo.model.Response
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
 import java.io.File
 
 /**
@@ -19,9 +17,10 @@ class TestUnitViewModel : BaseViewModel() {
 
     override fun start(bundle: Bundle?) {
         val action = bundle?.getString("action", "")
+        val data = bundle?.getString("data", "")
         when (action) {
             "file_list" -> {
-                fetchFileList()
+                fetchFileList(data)
             }
 
             "file_upload" -> {
@@ -35,44 +34,16 @@ class TestUnitViewModel : BaseViewModel() {
     override fun stop() {
     }
 
-
-    private fun testRequestTranslate() {
-        val httpParams = HttpParams()
-        val from = "zh"
-        val to = "en"
-        val jsonArray = JSONArray()
-        jsonArray.put("我叫什么名字")
-        httpParams.put("from", from)
-        httpParams.put("to", to)
-        httpParams.put("contents", jsonArray.toString())
-        val jsonObject = JSONObject()
-        try {
-            jsonObject.put("from", from)
-            jsonObject.put("to", to)
-            jsonObject.put("contents", jsonArray)
-        } catch (e: JSONException) {
-            e.printStackTrace()
-        }
-        val requestUrl = "http://test.ileja.com/ar/server/dui/translate"
-        OkGo.post<String>(requestUrl)
-            .upJson(jsonObject)
-            .execute(object : StringCallback() {
-                override fun onSuccess(response: Response<String>) {
-                }
-
-                override fun onError(response: Response<String>) {
-                }
-            })
-
-    }
-
-
-    fun fetchFileList() {
+    fun fetchFileList(dir: String?) {
         //http://106.12.132.116:8088/test/get/file/list?dir=myfile
         val requestUrl = "http://106.12.132.116:8088/test/get/file/list"
-//        val requestUrl = "http://192.168.1.116:8088/test/get/file/list"
+//        val requestUrl = "http://192.168.1.104:8088/test/get/file/list"
         val httpParams = HttpParams()
-        httpParams.put("dir", "myfile")
+        if (TextUtils.isEmpty(dir)) {
+            httpParams.put("dir", "myfile")
+        } else {
+            httpParams.put("dir", dir)
+        }
         OkGo.get<String>(requestUrl)
             .params(httpParams)
             .execute(object : StringCallback() {
@@ -88,9 +59,9 @@ class TestUnitViewModel : BaseViewModel() {
                 override fun onError(response: Response<String>?) {
                     AILog.i(
                         TAG,
-                        "onError body = ${response?.body()} ,code = ${response?.code()} , message = ${response?.message()}"
+                        "onError code = ${response?.code()},error = ${response?.exception}"
                     )
-                    action.postValue("onError body = ${response?.body()} ,code = ${response?.code()} , message = ${response?.message()}")
+                    action.postValue("onError code = ${response?.code()},error = ${response?.exception} ")
 
 
                 }
@@ -117,7 +88,7 @@ class TestUnitViewModel : BaseViewModel() {
                 override fun onError(response: Response<String>) {
                     AILog.i(
                         TAG,
-                        "onError body = ${response?.body()} ,code = ${response?.code()} , message = ${response?.message()}"
+                        "onError code = ${response?.code()},error = ${response?.exception}"
                     )
                 }
             })

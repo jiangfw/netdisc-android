@@ -58,7 +58,7 @@ import okio.Buffer;
  * ================================================
  */
 public class OkGo {
-    public static final long DEFAULT_MILLISECONDS = 60000;      //默认的超时时间
+    public static final long DEFAULT_MILLISECONDS = 10000;      //默认的超时时间
     public static long REFRESH_TIME = 300;                      //回调刷新时间（单位ms）
 
     private Application context;            //全局上下文
@@ -72,7 +72,7 @@ public class OkGo {
 
     private OkGo() {
         mDelivery = new Handler(Looper.getMainLooper());
-        mRetryCount = 3;
+        mRetryCount = 0;
         mCacheTime = CacheEntity.CACHE_NEVER_EXPIRE;
         mCacheMode = CacheMode.NO_CACHE;
 

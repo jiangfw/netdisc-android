@@ -5,7 +5,6 @@ import android.os.Parcelable;
 import android.text.format.DateUtils;
 import android.webkit.MimeTypeMap;
 
-import com.fuwei.android.libcommon.logger.AILog;
 import com.fuwei.android.libcommon.rfc3339.Rfc3339Parser;
 import com.fuwei.android.libcommon.rfc3339.Rfc3339Strict;
 
@@ -42,12 +41,6 @@ public class FileItem implements Parcelable {
         this.formattedModTime = modTimeToFormattedTime(this.modTime);
         this.mimeType = getMimeType(mimeType, path);
         this.isDir = isDir;
-
-        AILog.e("fuwei", "modTime = " + modTime + ",this.modTime = " + this.modTime);
-
-        // 2022-04-21T07:10:51Z
-        // 2022-04-20T15:43:41+0800
-
     }
 
     protected FileItem(Parcel in) {

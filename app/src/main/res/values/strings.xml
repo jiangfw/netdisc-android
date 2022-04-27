@@ -8,5 +8,12 @@
     <string name="empty_folder">The folder is empty</string>
     <string name="no_search_results">No search results</string>
 
+    <string name="fab_upload_files">Upload Files</string>
+    <string name="fab_new_folder">New Folder</string>
+
+    <string name="download">Download</string>
+    <string name="move">Move</string>
+    <string name="rename">Rename</string>
+    <string name="delete">Delete</string>
 
 </resources>
